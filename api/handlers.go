@@ -1,14 +1,16 @@
 package api
 
 import (
-    "net/http"
-    "github.com/gin-gonic/gin"
-    "go.mongodb.org/mongo-driver/mongo"
-    "go.mongodb.org/mongo-driver/bson"
-    "go.mongodb.org/mongo-driver/bson/primitive"
-    "context"
-    "time"
-    "comment-service/models"
+	"comment-service/models"
+	"context"
+	"fmt"
+	"net/http"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func createComment(collection *mongo.Collection) gin.HandlerFunc {
@@ -16,6 +18,15 @@ func createComment(collection *mongo.Collection) gin.HandlerFunc {
         var comment models.Comment
         if err := c.BindJSON(&comment); err != nil {
             c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+            return
+        }
+        
+        // Log the received comment data
+        fmt.Printf("Received comment: %+v\n", comment)
+        
+        // Ensure postId is not empty
+        if comment.PostId == "" {
+            c.JSON(http.StatusBadRequest, gin.H{"error": "postId is required"})
             return
         }
         
@@ -34,7 +45,13 @@ func createComment(collection *mongo.Collection) gin.HandlerFunc {
 
 func getAllComments(collection *mongo.Collection) gin.HandlerFunc {
     return func(c *gin.Context) {
-        cursor, err := collection.Find(context.Background(), bson.M{})
+        postId := c.Query("postId")
+        if postId == "" {
+            c.JSON(http.StatusBadRequest, gin.H{"error": "postId is required"})
+            return
+        }
+
+        cursor, err := collection.Find(context.Background(), bson.M{"postId": postId})
         if err != nil {
             c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching comments"})
             return
