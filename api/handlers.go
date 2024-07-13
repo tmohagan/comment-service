@@ -25,7 +25,7 @@ func createComment(collection *mongo.Collection) gin.HandlerFunc {
         fmt.Printf("Received comment: %+v\n", comment)
         
         // Ensure postId is not empty
-        if comment.PostId == "" {
+        if comment.PostID == "" {
             c.JSON(http.StatusBadRequest, gin.H{"error": "postId is required"})
             return
         }
