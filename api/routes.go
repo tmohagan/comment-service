@@ -29,8 +29,8 @@ func SetupRoutes(router *gin.Engine, client *mongo.Client) {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 	router.POST("/comments", createComment(commentsCollection))
-	router.GET("/comments", getAllComments(commentsCollection))
-	router.GET("/comments/:id", getComment(commentsCollection))
+	router.GET("/comments/:postID", getAllComments(commentsCollection))  // Changed this line
+	router.GET("/comment/:id", getComment(commentsCollection))  // Changed to /comment/:id for single comment
 	router.PUT("/comments/:id", updateComment(commentsCollection))
 	router.DELETE("/comments/:id", deleteComment(commentsCollection))
 }

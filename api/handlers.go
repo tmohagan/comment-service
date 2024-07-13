@@ -45,14 +45,17 @@ func createComment(collection *mongo.Collection) gin.HandlerFunc {
 
 func getAllComments(collection *mongo.Collection) gin.HandlerFunc {
     return func(c *gin.Context) {
-        postID := c.Param("id")
+        postID := c.Param("postID")  // Changed from "id" to "postID"
         if postID == "" {
-            c.JSON(http.StatusBadRequest, gin.H{"error": "postId is required"})
+            c.JSON(http.StatusBadRequest, gin.H{"error": "postID is required"})
             return
         }
 
+        fmt.Printf("Fetching comments for postID: %s\n", postID)
+
         cursor, err := collection.Find(context.Background(), bson.M{"post_id": postID})
         if err != nil {
+            fmt.Printf("Error fetching comments: %v\n", err)
             c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching comments"})
             return
         }
@@ -60,10 +63,12 @@ func getAllComments(collection *mongo.Collection) gin.HandlerFunc {
         
         var comments []models.Comment
         if err = cursor.All(context.Background(), &comments); err != nil {
+            fmt.Printf("Error decoding comments: %v\n", err)
             c.JSON(http.StatusInternalServerError, gin.H{"error": "Error decoding comments"})
             return
         }
         
+        fmt.Printf("Found %d comments for postID: %s\n", len(comments), postID)
         c.JSON(http.StatusOK, comments)
     }
 }
