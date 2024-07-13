@@ -45,13 +45,13 @@ func createComment(collection *mongo.Collection) gin.HandlerFunc {
 
 func getAllComments(collection *mongo.Collection) gin.HandlerFunc {
     return func(c *gin.Context) {
-        postId := c.Param("id")
-        if postId == "" {
+        postID := c.Param("id")
+        if postID == "" {
             c.JSON(http.StatusBadRequest, gin.H{"error": "postId is required"})
             return
         }
 
-        cursor, err := collection.Find(context.Background(), bson.M{"postId": postId})
+        cursor, err := collection.Find(context.Background(), bson.M{"post_id": postID})
         if err != nil {
             c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching comments"})
             return
