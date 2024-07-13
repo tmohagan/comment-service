@@ -45,7 +45,7 @@ func createComment(collection *mongo.Collection) gin.HandlerFunc {
 
 func getAllComments(collection *mongo.Collection) gin.HandlerFunc {
     return func(c *gin.Context) {
-        postId := c.Query("postId")
+        postId := c.Param("id")
         if postId == "" {
             c.JSON(http.StatusBadRequest, gin.H{"error": "postId is required"})
             return
